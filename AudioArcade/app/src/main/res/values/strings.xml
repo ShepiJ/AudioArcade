@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AudioArcade</string>
+    <string name="tab_text_musica">Musica</string>
+    <string name="tab_text_albumes">Albumes</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

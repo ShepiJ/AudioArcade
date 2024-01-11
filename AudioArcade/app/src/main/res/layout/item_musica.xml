@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/teal_700"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imageViewAlbum"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="Album Image"
+        app:tint="@color/black"
+        android:src="@drawable/album" />
+
+    <TextView
+        android:id="@+id/textViewAlbum"
+        android:layout_width="0dp"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingStart="16dp"
+        android:text="Music Name"
+        android:textSize="18sp" />
+
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="48dp"
+        android:background="@color/teal_700"
+        android:layout_height="48dp"
+        android:paddingEnd="30dp"
+        app:tint="@color/black"
+        android:contentDescription="Play Button"
+        android:src="@drawable/play" />
+</LinearLayout>

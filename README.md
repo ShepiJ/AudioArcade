@@ -1,6 +1,6 @@
 # AudioArcade
 
-![logo_transparent](https://github.com/ShepiJ/AudioArcade/assets/127141346/a0f2d9a0-fdb0-4dc1-b9b7-f0652dfec95d)
+![logo](https://github.com/ShepiJ/AudioArcade/assets/127141346/a1189457-7c4f-4b7d-b3d4-0671f6577016)
 
 A music app with a audio visualizer that well, i just want to make for myself and for anyone interested.
 

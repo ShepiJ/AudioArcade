@@ -12,6 +12,7 @@
         android:id="@+id/imageViewAlbum"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:scaleType="fitXY"
         android:contentDescription="Album Image"
         app:tint="@color/black"
         android:src="@drawable/album" />
@@ -28,11 +29,11 @@
 
     <ImageButton
         android:id="@+id/playButton"
-        android:layout_width="48dp"
+        android:layout_width="30dp"
+        android:layout_height="40dp"
         android:background="@color/teal_700"
-        android:layout_height="48dp"
-        android:paddingEnd="30dp"
-        app:tint="@color/black"
         android:contentDescription="Play Button"
-        android:src="@drawable/play" />
+        android:scaleType="fitXY"
+        android:src="@drawable/play"
+        app:tint="@color/black" />
 </LinearLayout>

@@ -1,12 +1,13 @@
 package com.jose_sanchis_hueso.audioarcade.adapters
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.jose_sanchis_hueso.audioarcade.MusicInFolder
+import com.jose_sanchis_hueso.audioarcade.MusicInFolderActivity
 import com.jose_sanchis_hueso.audioarcade.R
 
 class AlbumAdapter(private val albumList: List<String>) :
@@ -33,7 +34,7 @@ class AlbumAdapter(private val albumList: List<String>) :
         private val albumTextView: TextView = itemView.findViewById(R.id.textViewAlbum)
 
         init {
-            // Attach the click listener to the whole item view
+
             itemView.setOnClickListener(this)
         }
 
@@ -41,14 +42,15 @@ class AlbumAdapter(private val albumList: List<String>) :
             albumTextView.text = albumName
         }
 
-        // Handle click events
+
         override fun onClick(v: View) {
-            // Get the clicked album name
+
             val clickedAlbum = albumList[adapterPosition]
 
-            // Start the new activity with the clicked album name
-            val intent = Intent(v.context, MusicInFolder::class.java)
+
+            val intent = Intent(v.context, MusicInFolderActivity::class.java)
             intent.putExtra("ALBUM_NAME", clickedAlbum)
+            Log.e("ALBUM_NAME", clickedAlbum)
             v.context.startActivity(intent)
         }
     }

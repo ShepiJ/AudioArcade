@@ -31,7 +31,7 @@ class AlbumesFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_albumes, container, false)
         recyclerView = view.findViewById(R.id.recyclerViewAlbums)
 
-        // Get the full path to the Music directory
+
         val musicFolderPath =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
                 .absolutePath
@@ -47,9 +47,9 @@ class AlbumesFragment : Fragment() {
         val musicFolder = File(musicFolderPath)
         val albumList = mutableListOf<String>()
 
-        // Check if the music folder exists and is a directory
+
         if (musicFolder.exists() && musicFolder.isDirectory) {
-            // Check if subdirectories is not null
+
             musicFolder.listFiles { file -> file.isDirectory }?.forEach {
                 val albumName = it.name
                 if (albumName != ".thumbnails") {

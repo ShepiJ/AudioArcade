@@ -1,13 +1,11 @@
 package com.jose_sanchis_hueso.audioarcade
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
+import android.widget.ImageButton
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import com.jose_sanchis_hueso.audioarcade.databinding.ActivityMusicBinding
 import kotlinx.coroutines.*
 import java.util.Locale
@@ -17,10 +15,16 @@ import kotlin.coroutines.CoroutineContext
 class MusicActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var binding: ActivityMusicBinding
-    private lateinit var exoPlayer: SimpleExoPlayer
+    private lateinit var mediaPlayer: MediaPlayer
     private var isPlaying: Boolean = false
-    private var duration: Long = 0
+    private var duration: Int = 0
     private var job: Job = Job()
+    private var playMode: PlayMode = PlayMode.NORMAL
+
+    enum class PlayMode {
+        NORMAL,
+        RANDOM
+    }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
@@ -33,10 +37,10 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
         val filePath = intent.getStringExtra("FILE_PATH")
 
         launch(Dispatchers.IO) {
-            exoPlayer = filePath?.let { createAndPrepareExoPlayer(it) }!!
+            mediaPlayer = filePath?.let { createAndPrepareMediaPlayer(it) }!!
 
             withContext(Dispatchers.Main) {
-                duration = exoPlayer.duration
+                duration = mediaPlayer.duration
                 playMusic()
                 setupSeekBar()
                 updateSeekBar()
@@ -48,30 +52,50 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
                         playMusic()
                     }
                 }
+
+                binding.progressSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                        if (fromUser) {
+                            mediaPlayer.seekTo(progress)
+                            binding.elapsedTimeTextView.text = formatTime(progress)
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                        // Do nothing
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                        // Do nothing
+                    }
+                })
+
+                binding.backButton.setOnClickListener {
+                    playPrevious()
+                }
+
+                binding.nextButton.setOnClickListener {
+                    playNext()
+                }
+
+                binding.playMode.setOnClickListener {
+                    togglePlayMode()
+                }
             }
         }
     }
-    private suspend fun createAndPrepareExoPlayer(filePath: String): SimpleExoPlayer =
-        withContext(Dispatchers.Main) {
-            val player = SimpleExoPlayer.Builder(this@MusicActivity).build()
-            val dataSourceFactory = DefaultDataSourceFactory(this@MusicActivity, Util.getUserAgent(this@MusicActivity, "YourAppName"))
-            val mediaSource = buildMediaSource(filePath, dataSourceFactory)
 
-            player.setMediaSource(mediaSource)
-            player.prepare()
-            player
+    private suspend fun createAndPrepareMediaPlayer(filePath: String): MediaPlayer =
+        withContext(Dispatchers.Main) {
+            val mediaPlayer = MediaPlayer()
+            mediaPlayer.setDataSource(filePath)
+            mediaPlayer.prepare()
+            mediaPlayer
         }
 
-
-    private fun buildMediaSource(filePath: String, dataSourceFactory: DefaultDataSourceFactory): MediaSource {
-        val uri = android.net.Uri.parse(filePath)
-        return ProgressiveMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(uri)
-    }
-
     private fun setupSeekBar() {
-        binding.progressSeekBar.max = duration.toInt()
-        binding.totalDurationTextView.text = formatTime(duration.toInt())
+        binding.progressSeekBar.max = duration
+        binding.totalDurationTextView.text = formatTime(duration)
     }
 
     private fun updateSeekBar() {
@@ -79,8 +103,8 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
             while (isActive) {
                 delay(1000)
                 withContext(Dispatchers.Main) {
-                    binding.progressSeekBar.progress = exoPlayer.currentPosition.toInt()
-                    binding.elapsedTimeTextView.text = formatTime(exoPlayer.currentPosition.toInt())
+                    binding.progressSeekBar.progress = mediaPlayer.currentPosition
+                    binding.elapsedTimeTextView.text = formatTime(mediaPlayer.currentPosition)
                 }
             }
         }
@@ -93,22 +117,46 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun playMusic() {
-        exoPlayer.playWhenReady = true
+        mediaPlayer.start()
         isPlaying = true
         binding.playPauseButton.setImageResource(R.drawable.pause)
     }
 
     private fun pauseMusic() {
-        exoPlayer.playWhenReady = false
+        mediaPlayer.pause()
         isPlaying = false
         binding.playPauseButton.setImageResource(R.drawable.play)
     }
 
     private fun stopMusic() {
-        exoPlayer.stop()
-        exoPlayer.release()
+        mediaPlayer.stop()
+        mediaPlayer.release()
         isPlaying = false
         finish()
+    }
+
+    private fun playNext() {
+
+        if (playMode == PlayMode.RANDOM) {
+
+        } else {
+
+        }
+    }
+
+    private fun playPrevious() {
+
+        if (playMode == PlayMode.RANDOM) {
+
+        } else {
+
+        }
+    }
+
+    private fun togglePlayMode() {
+
+        playMode = if (playMode == PlayMode.NORMAL) PlayMode.RANDOM else PlayMode.NORMAL
+
     }
 
     override fun onDestroy() {
@@ -116,11 +164,15 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
         job.cancel()
 
         if (isPlaying) {
-            exoPlayer.stop()
-            exoPlayer.release()
+            stopMusic()
         }
     }
 }
+
+
+
+
+
 
 
 

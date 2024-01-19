@@ -18,13 +18,14 @@
 
     <SeekBar
         android:id="@+id/progressSeekBar"
-        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        style="@style/Widget.AppCompat.SeekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="8dp"
         android:max="100"
         android:progress="0" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -81,6 +82,15 @@
             android:id="@+id/nextButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:scaleType="fitXY"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/next" />
+
+        <ImageButton
+            android:id="@+id/playMode"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="60dp"
             android:scaleType="fitXY"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/next" />

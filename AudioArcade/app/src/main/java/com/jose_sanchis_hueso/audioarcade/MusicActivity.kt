@@ -1,12 +1,30 @@
 package com.jose_sanchis_hueso.audioarcade
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Paint
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.widget.ImageButton
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.jose_sanchis_hueso.audioarcade.databinding.ActivityMusicBinding
+import io.github.jeffshee.visualizer.painters.fft.*
+import io.github.jeffshee.visualizer.painters.misc.SimpleIcon
+import io.github.jeffshee.visualizer.painters.modifier.Beat
+import io.github.jeffshee.visualizer.painters.modifier.Move
+import io.github.jeffshee.visualizer.painters.modifier.Rotate
+import io.github.jeffshee.visualizer.painters.modifier.Shake
+import io.github.jeffshee.visualizer.painters.waveform.Waveform
+import io.github.jeffshee.visualizer.utils.Preset
+import io.github.jeffshee.visualizer.utils.VisualizerHelper
+import io.github.jeffshee.visualizer.views.VisualizerView
 import kotlinx.coroutines.*
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -21,6 +39,12 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
     private var job: Job = Job()
     private var playMode: PlayMode = PlayMode.NORMAL
 
+    private lateinit var helper: VisualizerHelper
+    private lateinit var background: Bitmap
+    private lateinit var bitmap: Bitmap
+    private lateinit var circleBitmap: Bitmap
+    private var current = 0
+
     enum class PlayMode {
         NORMAL,
         RANDOM
@@ -28,6 +52,7 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,9 +106,13 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
                 binding.playMode.setOnClickListener {
                     togglePlayMode()
                 }
+
+                init()
             }
         }
     }
+
+
 
     private suspend fun createAndPrepareMediaPlayer(filePath: String): MediaPlayer =
         withContext(Dispatchers.Main) {
@@ -158,6 +187,52 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
         playMode = if (playMode == PlayMode.NORMAL) PlayMode.RANDOM else PlayMode.NORMAL
 
     }
+    
+    private fun init() {
+        var visual = binding.visual
+
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 0)
+        } else {
+            background = BitmapFactory.decodeResource(resources, R.drawable.background)
+            bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
+            circleBitmap = SimpleIcon.getCircledBitmap(bitmap)
+
+            helper = VisualizerHelper(mediaPlayer.audioSessionId)
+
+            val painterLists = listOf(
+                listOf(FftBar(), Move(FftWave(), yR = .5f)),
+                listOf(FftLine(), Move(FftWaveRgb(), yR = .5f)),
+                listOf(Rotate(SimpleIcon(circleBitmap).apply { radiusR = .5f }).apply { rpm = 2f }),
+                listOf(Preset.getPresetWithBitmap("cIcon", circleBitmap)),
+                listOf(Beat(Preset.getPresetWithBitmap("cIcon", circleBitmap))),
+                listOf(
+                    Waveform().apply { paint.alpha = 150 },
+                    Shake(Preset.getPresetWithBitmap("cWaveRgbIcon", circleBitmap)).apply {
+                        animX.duration = 1000
+                        animY.duration = 2000
+                    }),
+                listOf(
+                    Preset.getPresetWithBitmap("liveBg", background),
+                    FftCircle().apply { paint.strokeWidth = 8f; paint.strokeCap = Paint.Cap.ROUND }
+                )
+            )
+
+            visual.setPainterList(helper, painterLists[current])
+
+            visual.setOnLongClickListener {
+                if (current < painterLists.lastIndex) current++ else current = 0
+                visual.setPainterList(helper, painterLists[current])
+                true
+            }
+
+            Toast.makeText(this, "Try long-click \ud83d\ude09", Toast.LENGTH_LONG).show()
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -166,6 +241,8 @@ class MusicActivity : AppCompatActivity(), CoroutineScope {
         if (isPlaying) {
             stopMusic()
         }
+        helper.release()
+        super.onDestroy()
     }
 }
 

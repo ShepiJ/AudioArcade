@@ -6,15 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#292727"
     tools:context=".MusicActivity">
 
-    <ImageView
-        android:id="@+id/albumArtImageView"
+    <io.github.jeffshee.visualizer.views.VisualizerView
+        android:id="@+id/visual"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:scaleType="fitXY"
-        android:src="@drawable/delete" />
+        android:scaleType="fitXY" />
 
     <SeekBar
         android:id="@+id/progressSeekBar"

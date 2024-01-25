@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "AudioArcade"
-include ':app'
+include ':app', ':visualizer'
